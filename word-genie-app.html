@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Genie - Magical Word Selector</title>
+    <!-- Favicon using genie lamp emoji -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧞</text></svg>">
+    <!-- Web App Manifest for mobile installation -->
+    <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22Word%20Genie%22,%22short_name%22:%22WordGenie%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%231a0033%22,%22theme_color%22:%22%234b0082%22,%22description%22:%22A%20magical%20word%20selector%20app%22,%22icons%22:[{%22src%22:%22data:image/svg+xml,<svg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%20100%20100%27><text%20y=%27.9em%27%20font-size=%2790%27>🧞</text></svg>%22,%22sizes%22:%22192x192%22,%22type%22:%22image/svg+xml%22},{%22src%22:%22data:image/svg+xml,<svg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%20100%20100%27><text%20y=%27.9em%27%20font-size=%2790%27>🧞</text></svg>%22,%22sizes%22:%22512x512%22,%22type%22:%22image/svg+xml%22}]}">
+    <!-- Apple Touch Icon -->
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧞</text></svg>">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#4b0082">
+    <style>
+        /* Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Trebuchet MS', 'Papyrus', fantasy;
+        }
+        
+        @import url('https://fonts.googleapis.com/css2?family=Aladdin&display=swap');
+        
+        body, button, input, h1, div {
+            font-family: 'Trebuchet MS', 'Papyrus', fantasy;
+            letter-spacing: 1px;
+        }
+        
+        body {
+            background-color: #1a0033;
+            background-image: radial-gradient(circle, rgba(60, 10, 100, 0.3) 2px, transparent 2px);
+            background-size: 30px 30px;
+            color: #fff;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        /* Title Styles */
+        .title {
+            margin-bottom: 20px;
+            text-align: center;
+            color: #f8d56b;
+            text-shadow: 0 0 10px rgba(248, 213, 107, 0.7);
+            font-size: 2.5rem;
+            letter-spacing: 3px;
+            position: relative;
+            font-weight: bold;
+            font-style: italic;
+        }
+        
+        .title::after {
+            content: "✨";
+            position: absolute;
+            font-size: 1.5rem;
+            right: -25px;
+            top: 0;
+            animation: sparkle 2s infinite;
+        }
+        
+        .title::before {
+            content: "✨";
+            position: absolute;
+            font-size: 1.5rem;
+            left: -25px;
+            top: 0;
+            animation: sparkle 1.5s infinite 0.5s;
+        }
+        
+        /* Input Area */
+        .input-area {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .input-label {
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+            color: #c5a0ff;
+            text-shadow: 0 0 5px rgba(197, 160, 255, 0.5);
+        }
+        
+        .word-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #9370DB;
+            border-radius: 25px;
+            background-color: rgba(0, 0, 0, 0.3);
+            color: #fff;
+            font-size: 1rem;
+            margin-bottom: 15px;
+            outline: none;
+            box-shadow: 0 0 15px rgba(147, 112, 219, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .word-input:focus {
+            border-color: #f8d56b;
+            box-shadow: 0 0 15px rgba(248, 213, 107, 0.5);
+        }
+        
+        /* Button Styles */
+        .btn {
+            background: linear-gradient(45deg, #9370DB, #6a5acd);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            margin: 5px;
+            border-radius: 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 20px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(45deg, #a381ec, #7b6add);
+        }
+        
+        .btn:active {
+            transform: translateY(1px);
+        }
+        
+        .btn:disabled {
+            background: linear-gradient(45deg, #666, #999);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .btn-add {
+            background: linear-gradient(45deg, #6a5acd, #4b0082);
+        }
+        
+        .btn-wish {
+            background: linear-gradient(45deg, #f8d56b, #e6b800);
+            color: #4b0082;
+            font-weight: bold;
+        }
+        
+        .btn-clear {
+            background: linear-gradient(45deg, #ff5050, #cc0000);
+        }
+        
+        .buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            width: 100%;
+        }
+        
+        /* Genie Lamp */
+        .lamp {
+            width: 120px;
+            height: 80px;
+            position: relative;
+            margin-bottom: -40px;
+            z-index: 2;
+        }
+        
+        .lamp-base {
+            width: 80px;
+            height: 20px;
+            background: linear-gradient(45deg, #d4af37, #ffdf00, #d4af37);
+            border-radius: 50%;
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.7);
+        }
+        
+        .lamp-top {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(45deg, #d4af37, #ffdf00, #d4af37);
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-top-left-radius: 50%;
+            border-top-right-radius: 50%;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.7);
+        }
+        
+        .lamp-spout {
+            width: 60px;
+            height: 30px;
+            background: linear-gradient(45deg, #d4af37, #ffdf00, #d4af37);
+            position: absolute;
+            bottom: 40px;
+            left: 70%;
+            transform: rotate(30deg);
+            border-top-right-radius: 50%;
+            border-bottom-right-radius: 50%;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.7);
+        }
+        
+        /* Genie Bottle */
+        .genie-bottle-container {
+            width: 100%;
+            height: 350px;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .genie-bottle {
+            width: 200px;
+            height: 300px;
+            background: linear-gradient(135deg, rgba(30, 144, 255, 0.2), rgba(138, 43, 226, 0.2));
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50% 50% 0 0 / 30% 30% 0 0;
+            position: relative;
+            overflow: hidden;
+            clip-path: polygon(
+                20% 0%, 
+                80% 0%, 
+                100% 10%, 
+                100% 100%, 
+                0% 100%, 
+                0% 10%
+            );
+            box-shadow: 0 0 30px rgba(138, 43, 226, 0.5);
+            transition: all 0.5s ease;
+        }
+        
+        .bottle-neck {
+            width: 80px;
+            height: 40px;
+            background: linear-gradient(135deg, rgba(30, 144, 255, 0.3), rgba(138, 43, 226, 0.3));
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 40% 40% 0 0;
+            z-index: -1;
+        }
+        
+        .bottle-content {
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+        }
+        
+        .bottle-content::-webkit-scrollbar {
+            width: 5px;
+        }
+        
+        .bottle-content::-webkit-scrollbar-thumb {
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+        }
+        
+        .word-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 15px;
+            margin: 5px 0;
+            border-radius: 15px;
+            color: #c5a0ff;
+            font-size: 1.1rem;
+            animation: float 3s infinite ease-in-out;
+            position: relative;
+            max-width: 100%;
+            word-break: break-word;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            font-style: italic;
+        }
+        
+        .selected-word {
+            position: fixed;
+            bottom: 10%;
+            left: 50%;
+            transform: translate(-50%, 0);
+            font-size: 3rem;
+            color: #f8d56b;
+            text-shadow: 0 0 20px rgba(138, 43, 226, 0.8);
+            z-index: 100;
+            opacity: 0;
+            transition: all 0.5s ease;
+            pointer-events: none;
+            text-align: center;
+            max-width: 90vw;
+            word-break: break-word;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 10px 20px;
+            border-radius: 15px;
+            border: 2px solid rgba(138, 43, 226, 0.5);
+        }
+        
+        .smoke {
+            position: absolute;
+            width: 150%;
+            height: 150%;
+            background-image: radial-gradient(circle, rgba(72, 118, 255, 0.9) 0%, rgba(138, 43, 226, 0.6) 40%, rgba(138, 43, 226, 0) 70%);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            opacity: 0;
+            z-index: 10;
+            pointer-events: none;
+        }
+        
+        .sparkle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: white;
+            border-radius: 50%;
+            filter: blur(1px);
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        /* Animations */
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+        
+        @keyframes sparkle {
+            0%, 100% {
+                opacity: 0.2;
+                transform: scale(0.8);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.2);
+            }
+        }
+        
+        @keyframes smoke {
+            0% {
+                opacity: 0.8;
+                transform: translate(-50%, -50%) scale(0);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(2);
+            }
+        }
+        
+        @keyframes spawnSparkle {
+            0% {
+                transform: scale(0);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1.5);
+                opacity: 0;
+            }
+        }
+        
+        @keyframes selectedWordAnimation {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, 100%) scale(0.5);
+            }
+            20% {
+                opacity: 1;
+                transform: translate(-50%, 0) scale(1);
+            }
+            80% {
+                opacity: 1;
+                transform: translate(-50%, 0) scale(1.1);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(-50%, 0) scale(1.2);
+            }
+        }
+        
+        /* Bottle glow effect based on word count */
+        .glow-level-1 {
+            box-shadow: 0 0 30px rgba(138, 43, 226, 0.5);
+        }
+        
+        .glow-level-2 {
+            box-shadow: 0 0 40px rgba(138, 43, 226, 0.6);
+        }
+        
+        .glow-level-3 {
+            box-shadow: 0 0 50px rgba(138, 43, 226, 0.7);
+        }
+        
+        .glow-level-4 {
+            box-shadow: 0 0 60px rgba(138, 43, 226, 0.8);
+        }
+        
+        .glow-level-5 {
+            box-shadow: 0 0 70px rgba(138, 43, 226, 0.9);
+        }
+        
+        /* Mobile responsiveness */
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .title {
+                font-size: 2rem;
+            }
+            
+            .genie-bottle {
+                width: 180px;
+                height: 250px;
+            }
+            
+            .btn {
+                padding: 10px 15px;
+                font-size: 0.9rem;
+            }
+            
+            .word-input {
+                padding: 10px;
+            }
+            
+            .selected-word {
+                font-size: 2rem;
+                bottom: 5%;
+                padding: 8px 15px;
+            }
+            
+            .word-item {
+                font-size: 1rem;
+                padding: 6px 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">Word Genie</h1>
+        
+        <div class="input-area">
+            <label for="wordInput" class="input-label">Enter words (separated by commas)</label>
+            <input type="text" id="wordInput" class="word-input" placeholder="Type words here...">
+            <div class="buttons">
+                <button id="addButton" class="btn btn-add">Add to Genie Bottle</button>
+                <button id="wishButton" class="btn btn-wish" disabled>Make a Wish</button>
+                <button id="clearButton" class="btn btn-clear">Empty Bottle</button>
+            </div>
+        </div>
+        
+        <div class="lamp">
+            <div class="lamp-base"></div>
+            <div class="lamp-top"></div>
+            <div class="lamp-spout"></div>
+        </div>
+        
+        <div class="genie-bottle-container">
+            <div class="bottle-neck"></div>
+            <div class="genie-bottle">
+                <div class="bottle-content" id="bottleContent"></div>
+                <div class="smoke" id="smoke"></div>
+            </div>
+        </div>
+        
+        <div class="selected-word" id="selectedWord"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const wordInput = document.getElementById('wordInput');
+            const addButton = document.getElementById('addButton');
+            const wishButton = document.getElementById('wishButton');
+            const clearButton = document.getElementById('clearButton');
+            const bottleContent = document.getElementById('bottleContent');
+            const genieBottle = document.querySelector('.genie-bottle');
+            const smokeEffect = document.getElementById('smoke');
+            const selectedWordDisplay = document.getElementById('selectedWord');
+            
+            // Words array
+            let words = [];
+            
+            // Add word(s) to the bottle
+            function addWords() {
+                const input = wordInput.value.trim();
+                
+                if (input === '') return;
+                
+                // Split by commas and filter empty entries
+                const newWords = input.split(',')
+                    .map(word => word.trim())
+                    .filter(word => word !== '');
+                
+                if (newWords.length === 0) return;
+                
+                // Add words to array and update display
+                words = [...words, ...newWords];
+                updateBottleDisplay();
+                updateGlowEffect();
+                
+                // Enable wish button if at least 2 words are available
+                wishButton.disabled = words.length < 2;
+                
+                // Create sparkles for each word
+                newWords.forEach(() => createSparkles());
+                
+                // Clear input
+                wordInput.value = '';
+                wordInput.focus();
+            }
+            
+            // Update the bottle display
+            function updateBottleDisplay() {
+                bottleContent.innerHTML = '';
+                
+                words.forEach(word => {
+                    const wordElement = document.createElement('div');
+                    wordElement.classList.add('word-item');
+                    wordElement.textContent = word;
+                    wordElement.style.animationDelay = `${Math.random() * 2}s`;
+                    bottleContent.appendChild(wordElement);
+                });
+            }
+            
+            // Make a wish (select random word)
+            function makeWish() {
+                if (words.length < 2) return;
+                
+                // Disable buttons during animation
+                addButton.disabled = true;
+                wishButton.disabled = true;
+                clearButton.disabled = true;
+                
+                // Trigger smoke animation
+                smokeEffect.style.animation = 'smoke 2s ease-out forwards';
+                
+                // Select random word
+                const randomIndex = Math.floor(Math.random() * words.length);
+                const selectedWord = words[randomIndex];
+                
+                // Add "Your wish: " prefix to the selected word
+                selectedWordDisplay.innerHTML = '<span style="font-size: 0.6em; opacity: 0.8;">Your wish:</span><br>' + selectedWord;
+                
+                // Wait a bit before showing the word for better effect
+                setTimeout(() => {
+                    // Display selected word with animation
+                    selectedWordDisplay.style.animation = 'selectedWordAnimation 4s ease-out forwards';
+                    
+                    // Create lots of sparkles
+                    for (let i = 0; i < 30; i++) {
+                        setTimeout(() => createSparkles(), i * 40);
+                    }
+                }, 500);
+                
+                // Reset after animation completes
+                setTimeout(() => {
+                    smokeEffect.style.animation = '';
+                    selectedWordDisplay.style.animation = '';
+                    
+                    // Re-enable buttons
+                    addButton.disabled = false;
+                    wishButton.disabled = false;
+                    clearButton.disabled = false;
+                }, 4500);
+            }
+            
+            // Clear the bottle
+            function clearBottle() {
+                words = [];
+                bottleContent.innerHTML = '';
+                wishButton.disabled = true;
+                updateGlowEffect();
+            }
+            
+            // Create sparkle effect
+            function createSparkles() {
+                const sparkleCount = 10;
+                
+                for (let i = 0; i < sparkleCount; i++) {
+                    const sparkle = document.createElement('div');
+                    sparkle.classList.add('sparkle');
+                    
+                    // Random position within the bottle
+                    const x = 100 + Math.random() * 200 - 100;
+                    const y = 100 + Math.random() * 300 - 100;
+                    
+                    // Random color
+                    const hue = Math.floor(Math.random() * 60) + 40; // Gold/yellow range
+                    const color = `hsl(${hue}, 100%, 70%)`;
+                    
+                    // Set styles
+                    sparkle.style.left = `${x}px`;
+                    sparkle.style.top = `${y}px`;
+                    sparkle.style.backgroundColor = color;
+                    sparkle.style.boxShadow = `0 0 10px ${color}`;
+                    sparkle.style.animation = `spawnSparkle ${Math.random() * 1 + 1}s ease-out forwards`;
+                    
+                    // Add to bottle and remove after animation
+                    genieBottle.appendChild(sparkle);
+                    setTimeout(() => {
+                        sparkle.remove();
+                    }, 2000);
+                }
+            }
+            
+            // Update bottle glow based on word count
+            function updateGlowEffect() {
+                // Remove all glow classes
+                genieBottle.classList.remove('glow-level-1', 'glow-level-2', 'glow-level-3', 'glow-level-4', 'glow-level-5');
+                
+                // Add appropriate glow class based on word count
+                if (words.length > 0) {
+                    const glowLevel = Math.min(Math.ceil(words.length / 5), 5);
+                    genieBottle.classList.add(`glow-level-${glowLevel}`);
+                }
+            }
+            
+            // Event Listeners
+            addButton.addEventListener('click', addWords);
+            
+            wishButton.addEventListener('click', makeWish);
+            
+            clearButton.addEventListener('click', clearBottle);
+            
+            // Allow Enter key to add words
+            wordInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    addWords();
+                }
+            });
+            
+            // Initialize empty bottle
+            updateGlowEffect();
+        });
+    </script>
+</body>
+</html>
